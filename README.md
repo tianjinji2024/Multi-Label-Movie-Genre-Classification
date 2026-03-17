@@ -1,20 +1,42 @@
-# IMDb Movie Genre Classification Pipeline
+# IMDb Movie Genre Classification: A Multi-Model Comparison Pipeline
 
-## Overview
-This project addresses the problem of automated metadata enrichment for a streaming content library. It compares two machine learning approaches for classifying movie genres based on their plot descriptions.
+## Project Overview
+This project addresses a core challenge for ad-supported streaming platforms : **Automated Metadata Enrichment**. By leveraging a dataset of over 50,000 movie descriptions, I built a pipeline to classify content into 27 genres. This system demonstrates how to balance inference latency with semantic accuracy by comparing a high-speed linear baseline against a fine-tuned Transformer.
 
-## Key Design Choices
-1. **Modularity:** The project is divided into dedicated modules for Data Loading, Model Definitions, and Execution, ensuring it is production-ready and maintainable.
-2. **Analytical Rigor (Train/Val/Test):** I implemented an internal 80/20 validation split to monitor for overfitting during training. The final evaluation is performed on a completely unseen dataset to ensure the model generalizes well to new content.
-3. **Model Selection:** I compared a **Logistic Regression baseline** (for high-speed, low-cost inference) against **DistilBERT** (for deep semantic understanding). DistilBERT was chosen because it provides BERT-level performance at a fraction of the latency and memory footprint, which is essential for large scale.
-4. **Data Integrity:** Custom parsing logic was developed to handle the ` ::: ` delimiter used in the IMDb dataset.
+## Performance Results
+The pipeline achieves a significant uplift over the baseline while maintaining high generalization (zero data leakage).
+
+| Metric | Baseline (TF-IDF + LR) | DistilBERT (Transformer) |
+| :--- | :--- | :--- |
+| **Internal Val Accuracy** | ~58.0% | **~65.6%** |
+| **Final Test Accuracy** | ~57.7% | **~65.3%** |
+
+## Key Design Choices & System Architecture
+1.  **Three-Phase Pipeline:**
+    *   **Phase 1 (Baseline):** Establishes a performance floor using TF-IDF and Logistic Regression.
+    *   **Phase 2 (Fine-Tuning):** Fine-tunes a `distilbert-base-uncased` model. I chose DistilBERT for its optimal ROI—providing 97% of BERT’s performance with 40% less memory and faster inference.
+    *   **Phase 3 (Evaluation):** Conducts a final "blind" evaluation against a hidden solution dataset to measure real-world performance.
+2.  **Hardware Optimization:** The code is optimized for **Apple Silicon (MPS backend)**, enabling GPU-accelerated training on macOS.
+3.  **Analytical Rigor:** I implemented an internal 80/20 split and monitored both Training and Validation loss to detect overfitting before final testing.
+4.  **Data Engineering:** Developed custom parsing logic to handle the IMDb dataset’s non-standard ` ::: ` delimiter and variable-length synopses.
 
 ## How to Run
-1. Place the raw IMDb files (`train_data.txt`, `test_data.txt`, `test_data_solution.txt`) in the `data/` directory. 
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the pipeline: `python src/train_eval.py`
+1.  **Prepare Data:** Place `train_data.txt`, `test_data.txt`, and `test_data_solution.txt` in the `/data` directory. 
+    *   Dataset source: [IMDb Genre Classification (Kaggle)](https://www.kaggle.com/datasets/hijest/genre-classification-dataset-imdb)
+2.  **Install Dependencies:** 
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  **Run Pipeline:** 
+    ```bash
+    python src/train_eval.py
+    ```
 
-## Attribution
-- All code in `src/` was authored by me. 
-- Pre-trained transformer weights are provided by the [HuggingFace `transformers` library](https://huggingface.co/docs/transformers/models).
-- Dataset: IMDb Movie Genre Dataset from [Kaggle](https://www.kaggle.com/datasets/hijest/genre-classification-dataset-imdb?resource=download)
+## Attribution & Requirements
+*   **Authored by me:** All custom data loading logic (`data_loader.py`), model pipeline architecture, training loops, and evaluation metrics scripts.
+*   **Third-party libraries:** Pre-trained transformer weights and the Trainer API are provided by the [HuggingFace Transformers library](https://huggingface.co/docs/transformers/index).
+
+
+## Trade-offs & Future Improvements
+*   **Current Trade-off:** Used a 128-token context window to prioritize training speed on local hardware. 
+*   **Future Improvement:** Implement **Multi-label Classification** (e.g., a movie being both 'Horror' and 'Comedy') and utilize **Loss Weighting** to address the class imbalance in minority genres like 'Musical' or 'Short'.

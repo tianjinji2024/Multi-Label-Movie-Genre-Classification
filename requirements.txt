@@ -1,6 +1,12 @@
+# Data Processing
 pandas
-scikit-learn
-transformers
-torch
-tqdm
 numpy
+
+# Machine Learning & Modeling
+scikit-learn
+torch
+transformers>=4.30.0
+accelerate>=0.21.0
+
+# Utilities
+tqdm

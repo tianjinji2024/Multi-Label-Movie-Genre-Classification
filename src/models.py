@@ -12,7 +12,7 @@ class BaselineModel:
     def __init__(self):
         self.pipeline = Pipeline([
             ('tfidf', TfidfVectorizer(max_features=5000, stop_words='english')),
-            ('clf', LogisticRegression(max_iter=1000, multi_class='multinomial'))
+            ('clf', LogisticRegression(max_iter=1000))  # get rid of multinomial
         ])
 
     def train(self, texts, labels):
