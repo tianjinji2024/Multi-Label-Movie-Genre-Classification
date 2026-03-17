@@ -1,7 +1,8 @@
 # IMDb Movie Genre Classification: A Multi-Model Comparison Pipeline
 
 ## Project Overview
-This project addresses a core challenge for ad-supported streaming platforms : **Automated Metadata Enrichment**. By leveraging a dataset of over 50,000 movie descriptions, I built a pipeline to classify content into 27 genres. This system demonstrates how to balance inference latency with semantic accuracy by comparing a high-speed linear baseline against a fine-tuned Transformer.
+This project addresses a core challenge for ad-supported streaming platforms : **Automated Metadata Enrichment**. By leveraging a dataset of over 50,000 movie descriptions, I built a pipeline to classify content into 27 genres. This system demonstrates how to balance inference latency with semantic accuracy by comparing a high-speed linear baseline against a fine-tuned Transformer.  
+Project Walkthrough video available on [Youtube](https://youtu.be/GBjJkYTjUzE)
 
 ## Performance Results
 The pipeline achieves a significant uplift over the baseline while maintaining high generalization (zero data leakage).
